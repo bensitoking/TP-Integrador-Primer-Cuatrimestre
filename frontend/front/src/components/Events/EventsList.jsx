@@ -1,76 +1,49 @@
-import { useState, useEffect, useContext } from 'react'
-import { getEvents } from '../../services/eventService'
-import EventCard from './EventCard'
-import EventSearch from './EventSearch'
-import { EventContext } from '../../context/EventContext'
+import { useState, useEffect, useContext } from "react"
+import axios from "axios"
+import EventCard from "./EventCard"
+import { AuthContext } from "../../context/AuthContext"
 
-const EventsList = ({ showAlert }) => {
-  const { events, setEvents, currentPage, setCurrentPage, totalPages, setTotalPages, searchParams } = useContext(EventContext)
+export default function EventsList() {
+  const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const { isAuthenticated } = useContext(AuthContext)
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await getEvents(currentPage, searchParams)
-        setEvents(response.events)
-        setTotalPages(response.totalPages)
+        const response = await axios.get("http://localhost:3000/api/event", {
+          headers: isAuthenticated ? {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          } : {}
+        })
+        setEvents(response.data)
       } catch (error) {
-        showAlert('Error al cargar eventos', 'error')
+        setError('Error al cargar eventos. Intente más tarde.')
+        console.error("Error fetching events:", error)
       } finally {
         setLoading(false)
       }
     }
 
     fetchEvents()
-  }, [currentPage, searchParams, setEvents, setTotalPages, showAlert])
+  }, [isAuthenticated])
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1)
-  }
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
-  }
-
-  if (loading) return <div className="text-center py-8">Cargando eventos...</div>
+  if (loading) return <div className="loading">Cargando eventos...</div>
+  if (error) return <div className="error">{error}</div>
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Eventos Disponibles</h1>
-      
-      <EventSearch showAlert={showAlert} />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.map(event => (
-          <EventCard key={event._id} event={event} />
-        ))}
-      </div>
-
-      {events.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          No se encontraron eventos
-        </div>
-      )}
-
-      <div className="flex justify-between mt-8">
-        <button
-          onClick={handlePreviousPage}
-          disabled={currentPage === 1}
-          className="btn-secondary disabled:opacity-50"
-        >
-          Anterior
-        </button>
-        <span className="self-center">Página {currentPage} de {totalPages}</span>
-        <button
-          onClick={handleNextPage}
-          disabled={currentPage === totalPages}
-          className="btn-secondary disabled:opacity-50"
-        >
-          Siguiente
-        </button>
+    <div className="events-container">
+      <h2>Eventos Disponibles</h2>
+      <div className="events-grid">
+        {events.length > 0 ? (
+          events.map(event => (
+            <EventCard key={event._id} event={event} />
+          ))
+        ) : (
+          <p>No hay eventos disponibles</p>
+        )}
       </div>
     </div>
   )
 }
-
-export default EventsList
