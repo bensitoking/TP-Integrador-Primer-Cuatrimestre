@@ -1,6 +1,6 @@
+
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
 export const authenticateToken = (req, res, next) => {
@@ -9,6 +9,11 @@ export const authenticateToken = (req, res, next) => {
 
   if (!token) {
     return res.status(401).json({ success: false, message: 'Token no proporcionado' });
+  }
+
+  if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET no definido en .env');
+    return res.status(500).json({ success: false, message: 'Server error' });
   }
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {

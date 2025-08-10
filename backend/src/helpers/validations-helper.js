@@ -4,7 +4,15 @@ export const isEmailValid = (email) => {
 };
 
 export const isShortText = (text) => {
-  return typeof text !== 'string' || text.trim().length < 3;
+  if (text === undefined || text === null) return true;
+  if (typeof text !== 'string') return true;
+  return text.trim().length < 3;
+};
+
+export const isUsernameValid = (username) => {
+  if (username === undefined || username === null) return false;
+  if (typeof username !== 'string') return false;
+  return username.trim().length >= 3;
 };
 
 export const isPositiveNumber = (value) => {

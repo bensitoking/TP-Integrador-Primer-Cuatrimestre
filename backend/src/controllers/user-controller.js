@@ -1,3 +1,4 @@
+
 import express from 'express';
 import { register, login } from '../services/user-service.js';
 
@@ -6,18 +7,22 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
   try {
     const user = await register(req.body);
-    res.status(201).json(user);
+    return res.status(201).json({ success: true, message: '', user });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    return res.status(400).json({ success: false, message: err.message });
   }
 });
 
 router.post('/login', async (req, res) => {
   try {
     const token = await login(req.body);
-    res.status(200).json({ success: true, message: '', token });
+    return res.status(200).json({ success: true, message: '', token });
   } catch (err) {
-    res.status(401).json({ success: false, message: err.message, token: '' });
+    const msg = err.message || 'Error';
+    if (msg.toLowerCase().includes('username inválido')) {
+      return res.status(400).json({ success: false, message: 'El username es invalido.', token: '' });
+    }
+    return res.status(401).json({ success: false, message: 'Usuario o clave inválida.', token: '' });
   }
 });
 
