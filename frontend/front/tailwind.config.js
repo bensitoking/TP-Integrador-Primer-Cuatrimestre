@@ -1,10 +1,9 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-    // Añade estas rutas si usas componentes en otras ubicaciones
-    "./node_modules/react-tailwindcss-datepicker/dist/index.esm.js"
+    "./node_modules/react-tailwindcss-datepicker/dist/index.esm.js" // Si usas este datepicker
   ],
   theme: {
     extend: {
@@ -19,13 +18,13 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'], // Asegura que Inter esté cargado
+        sans: ['Inter', 'sans-serif'], // Asegurate de tener instalada la fuente Inter
       },
     },
   },
   plugins: [
     require('@tailwindcss/forms'),
-    require('@tailwindcss/typography'), // Útil para contenido textual
-    require('@tailwindcss/aspect-ratio'), // Para manejar aspect-ratio
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/aspect-ratio'),
   ],
 }

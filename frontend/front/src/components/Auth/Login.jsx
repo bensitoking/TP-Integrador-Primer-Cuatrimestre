@@ -1,45 +1,51 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import axios from "axios"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Login() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const navigate = useNavigate()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    setError("");
     try {
-      const response = await axios.post("/api/user/login", { email, password })
-      localStorage.setItem("token", response.data.token)
-      navigate("/events")
+      const response = await axios.post("/api/user/login", { email, password });
+      localStorage.setItem("token", response.data.token);
+      navigate("/events");
+      window.location.reload();
     } catch (err) {
-      setError("Credenciales incorrectas")
+      setError("Credenciales incorrectas");
     }
-  }
+  };
 
   return (
-    <div className="auth-form">
-      <h2>Iniciar Sesión</h2>
-      {error && <p className="error">{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Ingresar</button>
-      </form>
+    <div className="auth-container">
+      <div className="auth-box">
+        <h2 className="text-2xl font-bold mb-4">Iniciar Sesión</h2>
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            className="input-field"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            className="input-field"
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit" className="btn-primary w-full">Ingresar</button>
+        </form>
+      </div>
     </div>
-  )
+  );
 }

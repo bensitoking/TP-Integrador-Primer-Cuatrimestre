@@ -1,6 +1,7 @@
-
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
+
 import userRoutes from './src/controllers/user-controller.js';
 import eventRoutes from './src/controllers/event-controller.js';
 import locationRoutes from './src/controllers/event-location-controller.js';
@@ -12,6 +13,14 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// CORS para permitir peticiones desde el frontend
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Rutas
 app.use('/api/user', userRoutes);
 app.use('/api/event', eventRoutes);
 app.use('/api/event-location', locationRoutes);
