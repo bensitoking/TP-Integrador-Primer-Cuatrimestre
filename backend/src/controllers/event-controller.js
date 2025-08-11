@@ -38,7 +38,7 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-router.put('/', authenticateToken, async (req, res) => {
+router.patch('/', authenticateToken, async (req, res) => {
   try {
     const updated = await editEvent(req.body, req.user.id);
     res.json(updated);
