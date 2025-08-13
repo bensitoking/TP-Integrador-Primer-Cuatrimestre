@@ -9,11 +9,10 @@ import {
 import { authenticateToken } from '../middlewares/authentication-middleware.js';
 
 const router = express.Router();
-
 router.get('/', async (req, res) => {
   try {
     const events = await fetchEvents();
-    res.json({ collection: events });
+    res.json(events); // ← Ahora devuelve solo el array
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

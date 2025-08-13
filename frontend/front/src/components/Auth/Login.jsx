@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export default function Login() {
     e.preventDefault();
     setError("");
     try {
-      const response = await axios.post("/api/user/login", { email, password });
+      const response = await axios.post("/api/user/login", { username, password });
       localStorage.setItem("token", response.data.token);
       navigate("/events");
       window.location.reload();
@@ -29,10 +29,10 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             className="input-field"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUser(e.target.value)}
             required
           />
           <input

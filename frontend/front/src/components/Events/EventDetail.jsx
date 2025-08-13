@@ -71,6 +71,15 @@ const EventDetail = ({ showAlert }) => {
 
   if (loading) return <div className="text-center py-8">Cargando evento...</div>;
 
+  // Formatear fecha de forma segura
+  let fechaFormateada = "Fecha no disponible";
+  if (event.start_date) {
+    const fecha = new Date(event.start_date);
+    if (!isNaN(fecha)) {
+      fechaFormateada = format(fecha, "PPPPp", { locale: es });
+    }
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="card p-6 mb-6">
@@ -83,7 +92,7 @@ const EventDetail = ({ showAlert }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div>
                 <h3 className="font-semibold">Fecha y hora</h3>
-                <p className="event-meta">{format(new Date(event.date), "PPPPp", { locale: es })}</p>
+                <p className="event-meta">{fechaFormateada}</p>
               </div>
 
               <div>
@@ -98,14 +107,18 @@ const EventDetail = ({ showAlert }) => {
 
               <div>
                 <h3 className="font-semibold">Capacidad</h3>
-                <p className="event-meta">{event.participants?.length || 0} / {event.capacity} participantes</p>
+                <p className="event-meta">
+                  {event.participants?.length || 0} / {event.capacity} participantes
+                </p>
               </div>
             </div>
 
             <div className="mb-6">
               <h3 className="font-semibold mb-2">Tags</h3>
               <div className="flex flex-wrap gap-2">
-                {(event.tags || []).map(tag => <span key={tag} className="tag-chip">{tag}</span>)}
+                {(event.tags || []).map(tag => (
+                  <span key={tag} className="tag-chip">{tag}</span>
+                ))}
               </div>
             </div>
 
@@ -125,17 +138,37 @@ const EventDetail = ({ showAlert }) => {
               </div>
 
               {isAuthenticated ? (
-                <button onClick={handleEnrollment} disabled={loadingAction} className={`w-full mb-4 ${isEnrolled ? 'btn-danger' : 'btn-primary'}`}>
+                <button
+                  onClick={handleEnrollment}
+                  disabled={loadingAction}
+                  className={`w-full mb-4 ${isEnrolled ? 'btn-danger' : 'btn-primary'}`}
+                >
                   {loadingAction ? 'Procesando...' : (isEnrolled ? 'Cancelar inscripción' : 'Inscribirse')}
                 </button>
               ) : (
-                <button onClick={() => navigate('/login')} className="w-full btn-primary mb-4">Inicia sesión para inscribirte</button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="w-full btn-primary mb-4"
+                >
+                  Inicia sesión para inscribirte
+                </button>
               )}
 
               {user && user._id === event.creator?._id && (
                 <>
-                  <button onClick={() => navigate(`/editar-evento/${event._id}`)} className="w-full btn-secondary mb-2">Editar evento</button>
-                  <button onClick={handleDeleteEvent} disabled={loadingAction} className="w-full btn-danger">Eliminar evento</button>
+                  <button
+                    onClick={() => navigate(`/editar-evento/${event._id}`)}
+                    className="w-full btn-secondary mb-2"
+                  >
+                    Editar evento
+                  </button>
+                  <button
+                    onClick={handleDeleteEvent}
+                    disabled={loadingAction}
+                    className="w-full btn-danger"
+                  >
+                    Eliminar evento
+                  </button>
                 </>
               )}
             </div>

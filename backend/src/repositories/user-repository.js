@@ -1,4 +1,3 @@
-// src/repositories/user-repository.js
 import supabase from '../configs/db-config.js';
 
 export const findUserByUsername = async (username) => {

@@ -22,16 +22,25 @@ export const register = async (body) => {
   return created;
 };
 
+
 export const login = async (body) => {
-  const { username, password } = body;
+  const { username, password } = body || {};
 
   if (!isUsernameValid(username)) throw new Error('Username inválido');
 
+  console.log('[LOGIN] username recibido:', username);
+
   const user = await findUserByUsername(username);
+  console.log('[LOGIN] user encontrado?', !!user);
+
   if (!user) throw new Error('Usuario o clave inválida');
 
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) throw new Error('Usuario o clave inválida');
+
+  if (!process.env.JWT_SECRET) {
+    throw new Error('Error en el servidor: falta JWT_SECRET en configuración');
+  }
 
   const payload = {
     id: user.id,

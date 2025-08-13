@@ -13,9 +13,22 @@ export default function EventsList() {
     const fetchEvents = async () => {
       try {
         const response = await axios.get("http://localhost:3000/api/event", {
-          headers: isAuthenticated ? { Authorization: `Bearer ${localStorage.getItem('token')}` } : {}
+          headers: isAuthenticated
+            ? { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            : {}
         });
-        setEvents(response.data);
+
+        // Asegurarse de que events sea siempre un array
+        let data = response.data;
+        if (Array.isArray(data)) {
+          setEvents(data);
+        } else if (Array.isArray(data.events)) {
+          setEvents(data.events);
+        } else if (Array.isArray(data.data)) {
+          setEvents(data.data);
+        } else {
+          setEvents([]); // fallback seguro
+        }
       } catch (err) {
         setError('Error al cargar eventos. Intente más tarde.');
         console.error(err);
@@ -38,7 +51,9 @@ export default function EventsList() {
         <div className="text-center py-8 text-gray-600">No hay eventos disponibles</div>
       ) : (
         <div className="events-grid">
-          {events.map(event => <EventCard key={event._id} event={event} />)}
+          {events.map(event => (
+            <EventCard key={event.id || event._id} event={event} />
+          ))}
         </div>
       )}
     </div>

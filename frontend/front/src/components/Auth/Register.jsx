@@ -21,24 +21,17 @@ const Register = () => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const isValidEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
+    // Validaciones frontend
     if (formData.firstName.trim().length < 3) {
       setError('El nombre debe tener al menos 3 caracteres.');
       return;
     }
     if (formData.lastName.trim().length < 3) {
       setError('El apellido debe tener al menos 3 caracteres.');
-      return;
-    }
-    if (!isValidEmail(formData.username.trim())) {
-      setError('El email es inválido.');
       return;
     }
     if (formData.password.length < 3) {
@@ -59,27 +52,19 @@ const Register = () => {
         username: formData.username.trim(),
         password: formData.password
       };
-
-      const response = await registerUser(payload);
-      const token = response?.token || response?.data?.token;
-
-      if (token) {
-        login(token);
-        navigate('/events');
-        window.location.reload();
-        return;
-      }
-      if (response?.status === 201 || response?.data?.success) {
+    
+      const data = await registerUser(payload); // data ya es el body JSON del backend
+    
+      if (data.success) {
         navigate('/login');
         return;
       }
-
-      setError('Registro fallido. Intente nuevamente.');
+    
+      setError(data.message || 'Registro fallido. Intente nuevamente.');
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Error al registrar usuario');
-    } finally {
-      setLoading(false);
+      setError(err.message || 'Error al registrar usuario');
     }
+    
   };
 
   return (
@@ -112,11 +97,11 @@ const Register = () => {
           <input
             name="username"
             className="input-field"
-            placeholder="Email (será tu username)"
+            placeholder="Username"
             value={formData.username}
             onChange={handleChange}
             required
-            type="email"
+            type="text"
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

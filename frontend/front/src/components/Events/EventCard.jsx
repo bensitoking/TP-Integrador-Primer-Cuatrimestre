@@ -3,6 +3,15 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 const EventCard = ({ event }) => {
+  let fechaFormateada = "Fecha no disponible";
+
+  if (event.start_date) {
+    const fecha = new Date(event.start_date);
+    if (!isNaN(fecha)) {
+      fechaFormateada = format(fecha, "PPPPp", { locale: es });
+    }
+  }
+
   return (
     <article className="card">
       <div className="p-6">
@@ -11,16 +20,18 @@ const EventCard = ({ event }) => {
 
         <div className="flex items-center text-sm text-gray-600 mb-3">
           <span className="mr-2">📅</span>
-          <span>{format(new Date(event.date), "PPPPp", { locale: es })}</span>
+          <span>{fechaFormateada}</span>
         </div>
 
         <div className="flex items-center justify-between mt-4">
           <span className="font-bold text-lg">${event.price}</span>
-          <Link to={`/events/${event._id}`} className="btn-primary text-sm">Ver detalles</Link>
+          <Link to={`/events/${event.id || event._id}`} className="btn-primary text-sm">
+            Ver detalles
+          </Link>
         </div>
       </div>
     </article>
   );
-}
+};
 
 export default EventCard;
