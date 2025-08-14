@@ -13,19 +13,19 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// Login
 router.post('/login', async (req, res) => {
   try {
     const token = await login(req.body);
     return res.status(200).json({ success: true, message: 'Login exitoso', token });
   } catch (err) {
-    console.error('Error en login:', err);
-    const msg = (err.message || 'Error').toLowerCase();
-    if (msg.includes('username inválido')) {
-      return res.status(400).json({ success: false, message: 'El username es inválido', token: '' });
+    const mensaje = err.message || '';
+    if (mensaje.includes('Usuario o clave inválida')) {
+      return res.status(401).json({ success: false, message: 'Usuario o clave inválida', token: '' });
     }
-    return res.status(401).json({ success: false, message: 'Usuario o clave inválida', token: '' });
+    console.error('Error en login:', err);
+    return res.status(500).json({ success: false, message: 'Error interno del servidor', token: '' });
   }
 });
-
 
 export default router;

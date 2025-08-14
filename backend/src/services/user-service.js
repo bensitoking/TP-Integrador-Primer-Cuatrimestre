@@ -1,4 +1,3 @@
-
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { findUserByUsername, createUser } from '../repositories/user-repository.js';
@@ -22,24 +21,20 @@ export const register = async (body) => {
   return created;
 };
 
-
 export const login = async (body) => {
   const { username, password } = body || {};
 
-  if (!isUsernameValid(username)) throw new Error('Username inválido');
-
-  console.log('[LOGIN] username recibido:', username);
+  if (!isUsernameValid(username)) throw new Error('Usuario o clave inválida');
 
   const user = await findUserByUsername(username);
-  console.log('[LOGIN] user encontrado?', !!user);
-
-  if (!user) throw new Error('Usuario o clave inválida');
+  if (!user || !user.password) throw new Error('Usuario o clave inválida');
 
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) throw new Error('Usuario o clave inválida');
 
   if (!process.env.JWT_SECRET) {
-    throw new Error('Error en el servidor: falta JWT_SECRET en configuración');
+    console.error('JWT_SECRET no definido');
+    throw new Error('Error en el servidor');
   }
 
   const payload = {
@@ -49,6 +44,5 @@ export const login = async (body) => {
     username: user.username
   };
 
-  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-  return token;
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 };

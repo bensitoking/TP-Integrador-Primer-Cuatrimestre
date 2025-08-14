@@ -12,12 +12,22 @@ export default function Login() {
     e.preventDefault();
     setError("");
     try {
-      const response = await axios.post("/api/user/login", { username, password });
-      localStorage.setItem("token", response.data.token);
-      navigate("/events");
-      window.location.reload();
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/user/login`,
+        { username, password }
+      );
+
+      if (response.data.success) {
+        localStorage.setItem("token", response.data.token);
+        navigate("/");
+        window.location.reload();
+      } else {
+        setError(response.data.message || "Credenciales incorrectas");
+      }
     } catch (err) {
-      setError("Credenciales incorrectas");
+      setError(
+        err.response?.data?.message || "Error al iniciar sesión"
+      );
     }
   };
 
@@ -43,7 +53,9 @@ export default function Login() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit" className="btn-primary w-full">Ingresar</button>
+          <button type="submit" className="btn-primary w-full">
+            Ingresar
+          </button>
         </form>
       </div>
     </div>
